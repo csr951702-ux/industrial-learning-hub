@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>工業資訊系統與資料流｜每日學習站</title>
+<style>
+:root {
+  --bg:#f7f8fb; --panel:#ffffff; --text:#1d2433; --muted:#6b7280; --line:#dfe3ea;
+  --accent:#295ea8; --accent2:#eaf1fb; --chip:#eef2f7; --good:#1f7a5c;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Segoe UI","Noto Sans TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--text);}
+header{padding:26px 24px 18px;background:linear-gradient(135deg,#ffffff,#eef4fb);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.header-inner{max-width:1200px;margin:auto;display:flex;gap:18px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+h1{margin:0 0 6px;font-size:clamp(24px,4vw,38px);letter-spacing:.02em}
+.subtitle{color:var(--muted);max-width:760px;line-height:1.7}
+.badge{background:var(--accent2);color:var(--accent);padding:8px 12px;border-radius:999px;font-weight:700;font-size:14px}
+main{max-width:1200px;margin:0 auto;padding:24px}
+.toolbar{display:grid;grid-template-columns:1fr auto;gap:12px;margin-bottom:18px}
+.search{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:#fff;color:var(--text);padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.view{display:none} .view.active{display:block}
+.summary-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:20px}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
+.stat b{font-size:26px;display:block;margin-bottom:4px}
+.stat span{color:var(--muted);font-size:13px}
+.lesson-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.lesson{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;scroll-margin-top:120px}
+.lesson h3{margin:4px 0 8px;font-size:19px}
+.meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.day{font-weight:800;color:var(--accent)} .cat{background:var(--chip);border-radius:999px;padding:4px 9px;font-size:12px;color:#485466}
+.takeaway{margin-top:12px;padding:11px 12px;background:#f4f7fb;border-left:4px solid var(--accent);border-radius:8px;line-height:1.6}
+.details{margin-top:12px;display:grid;gap:8px}
+details{border-top:1px dashed var(--line);padding-top:8px}
+summary{cursor:pointer;font-weight:700}
+details p{color:#3f4a59;line-height:1.7;margin:8px 0 0}
+.keywords{margin-top:12px;display:flex;gap:6px;flex-wrap:wrap}
+.kw{font-size:12px;background:#f3f4f6;border-radius:999px;padding:4px 8px;color:#4b5563}
+.empty{padding:36px;text-align:center;color:var(--muted);background:#fff;border:1px dashed var(--line);border-radius:14px}
+.map-wrap{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px;overflow:auto}
+.map-note{color:var(--muted);font-size:14px;margin-bottom:16px;line-height:1.6}
+.mindmap{min-width:860px;display:grid;grid-template-columns:240px 1fr;gap:28px;align-items:start}
+.root{position:sticky;top:120px;background:var(--accent);color:#fff;border-radius:18px;padding:22px;font-weight:800;font-size:22px;line-height:1.4}
+.branches{display:grid;gap:18px}
+.branch{border-left:4px solid #cfd6df;padding-left:16px}
+.branch h3{margin:0 0 10px;font-size:17px}
+.nodes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.node{text-align:left;border:1px solid var(--line);background:#fff;border-radius:12px;padding:12px;cursor:pointer;transition:.15s}
+.node:hover{border-color:#9eb7d8;transform:translateY(-1px)}
+.node .n-day{font-size:12px;color:var(--accent);font-weight:800} .node .n-title{font-weight:700;margin-top:3px;line-height:1.4}
+.flow{background:#fff;border:1px solid var(--line);border-radius:16px;padding:18px}
+.flow-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.flow-step{background:#f7f9fc;border:1px solid var(--line);padding:10px 12px;border-radius:10px;font-weight:700}
+.arrow{color:#96a0af;font-weight:900}
+.legend{margin-top:14px;color:var(--muted);font-size:13px;line-height:1.6}
+footer{max-width:1200px;margin:0 auto;padding:6px 24px 30px;color:var(--muted);font-size:13px}
+@media(max-width:850px){
+  .summary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lesson-grid{grid-template-columns:1fr}
+  .toolbar{grid-template-columns:1fr}
+}
+@media(max-width:520px){
+  header{position:static}
+  main{padding:16px}
+  .summary-grid{grid-template-columns:1fr 1fr}
+  .stat{padding:12px}
+  .stat b{font-size:22px}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <div>
+      <h1>工業資訊系統與資料流｜每日學習站</h1>
+      <div class="subtitle">用「為什麼出現 → 來源 → 原理 → 演變 → 現代用途 → 工作案例」理解工業資訊系統，而不是只背名詞。</div>
+    </div>
+    <div class="badge" id="latestBadge">已整理 Day 1–12</div>
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <input id="search" class="search" type="search" placeholder="搜尋：PLC、MES、IP、盤點、Scanner…">
+    <div class="tabs">
+      <button class="tab active" data-view="lessons">每日課程</button>
+      <button class="tab" data-view="mindmap">思維導圖</button>
+      <button class="tab" data-view="flow">資料流全景</button>
+    </div>
+  </div>
+
+  <section id="lessons" class="view active">
+    <div class="summary-grid">
+      <div class="stat"><b id="totalLessons">12</b><span>已完成課程</span></div>
+      <div class="stat"><b>4</b><span>主要知識群組</span></div>
+      <div class="stat"><b id="totalKeywords">0</b><span>關鍵概念</span></div>
+      <div class="stat"><b>1</b><span>一條完整資料流</span></div>
+    </div>
+    <div id="lessonGrid" class="lesson-grid"></div>
+    <div id="emptyState" class="empty" style="display:none">沒有找到符合條件的課程。</div>
+  </section>
+
+  <section id="mindmap" class="view">
+    <div class="map-wrap">
+      <div class="map-note">點選任一節點，會直接跳回對應課程。之後只要新增一筆課程資料，這張圖也會自動增加新節點。</div>
+      <div class="mindmap">
+        <div class="root">工業資訊系統<br>與資料流</div>
+        <div id="branches" class="branches"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="flow" class="view">
+    <div class="flow">
+      <h2 style="margin-top:0">從現實世界到企業系統</h2>
+      <div class="flow-row" aria-label="工業資料流">
+        <div class="flow-step">實體物品</div><div class="arrow">→</div>
+        <div class="flow-step">Barcode / RFID</div><div class="arrow">→</div>
+        <div class="flow-step">Scanner / Reader</div><div class="arrow">→</div>
+        <div class="flow-step">RS-232 / Ethernet</div><div class="arrow">→</div>
+        <div class="flow-step">IP / TCP / Port</div><div class="arrow">→</div>
+        <div class="flow-step">IPC / PLC</div><div class="arrow">→</div>
+        <div class="flow-step">API / Modbus</div><div class="arrow">→</div>
+        <div class="flow-step">MES / WMS</div><div class="arrow">→</div>
+        <div class="flow-step">Database / ERP</div>
+      </div>
+      <div class="legend">
+        這條線不是所有專案都會完整出現，而是幫你建立「資料在哪裡產生 → 怎麼傳 → 誰判斷 → 誰保存 → 誰管理業務」的思考順序。
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>資料更新架構：LESSONS 陣列 → 自動生成課程卡片 + 思維導圖。單檔 HTML，可離線開啟。</footer>
+
+<script>
+const LESSONS = [{"day":1,"title":"Scanner：把現實世界的條碼變成資料","category":"識別與感知","why":"人工辨識商品慢、容易出錯，因此需要讓機器自動辨識物品。","source":"1940 年代超市自動辨識需求；Bernard Silver 與 Norman Joseph Woodland 發展條碼概念，Woodland 受摩斯密碼啟發。","original":"自動辨識商品，減少人工結帳與庫存紀錄負擔。","principle":"光源照射條碼 → 感光元件接收黑白反射差異 → Decoder 解碼 → 輸出字串，例如 A001。","evolution":"從早期雷射掃描器，逐步發展到影像式 1D/2D Scanner，可讀 QR Code、DataMatrix 等。","use":"零售結帳、倉儲收發貨、生產追溯、包裝驗證、資產盤點。","case":"Sensor 觸發固定式 Scanner，讀到 A001 後送往 IPC，再交由 MES 判定是否為正確產品。","takeaway":"Scanner 的本質不是『懂商品』，而是把光學圖案轉成電腦能處理的字串資料。","keywords":["Barcode","Decoder","光學辨識","固定式掃描器"]},{"day":2,"title":"RS-232：兩台設備怎麼直接說話","category":"通訊與網路","why":"設備需要交換資料，但不同廠商若各自定義電氣與傳輸規則，就很難互通。","source":"1960 年由 EIA 制定，最初服務於資料終端設備與 Modem 之間的串列通訊。","original":"讓電腦終端與數據機使用共同的串列通訊規則。","principle":"資料轉成 bit 後依序傳送；TX 負責傳送、RX 負責接收、GND 提供共同電位基準；雙方還要設定相同 Baud Rate 等參數。","evolution":"後來 USB 與 Ethernet 更普及，但 RS-232 因簡單、成熟、易除錯，在工業設備中仍大量存在。","use":"Scanner、電子秤、PLC、標籤機、CNC、量測設備等點對點通訊。","case":"Scanner 讀到 A001 後，透過 RS-232 把字串送進 IPC 的 COM Port。","takeaway":"RS-232 解決的是『兩台設備如何按照共同節奏，把 bit 一個一個傳過去』。","keywords":["TX","RX","GND","Baud Rate","Serial"]},{"day":3,"title":"Ethernet：讓很多設備共用同一個網路","category":"通訊與網路","why":"設備一多，若每兩台設備都單獨拉線，接線會快速失控。","source":"1970 年代 Xerox PARC 的 Ethernet 研究，受 ALOHAnet 等共享媒介通訊概念啟發。","original":"讓多台電腦在同一區域網路中交換資料並共享資源。","principle":"資料被封裝成 Ethernet Frame，包含來源與目的 MAC 等資訊；現代常透過 Switch 把 Frame 送到正確 Port。","evolution":"從共享同軸電纜演進到雙絞線、Switch、Gigabit Ethernet、PoE 等。","use":"工業 Scanner、PLC、IPC、Camera、Printer、AP 等設備網路連線。","case":"4 台固定式 Scanner 接入 Switch，再透過 Ethernet 與 IPC 通訊。","takeaway":"Ethernet 是很多設備共用的『道路系統』，但它本身還不是 IP 地址。","keywords":["MAC","Frame","Switch","PoE"]},{"day":4,"title":"IP Address：幫網路上的設備找到地址","category":"通訊與網路","why":"設備都接上網路後，還需要知道資料究竟要送到哪一台設備。","source":"1970 年代網際網路協定研究；TCP/IP 架構逐步形成，1983 年 ARPANET 轉換使用 TCP/IP。","original":"讓不同網路中的主機能被定位並進行封包路由。","principle":"IPv4 使用 32 bit 地址；Subnet Mask 用來判斷哪些位元代表網路、哪些代表主機；跨網段通常需要 Gateway/Router。","evolution":"私有 IPv4、NAT 被大量使用；因 IPv4 位址有限又發展 IPv6。","use":"設定 Scanner、PLC、Printer、IPC、Server 的網路位置與連線關係。","case":"Scanner 是 192.168.1.100，而 Notebook 是 192.168.0.25/24 時，兩者不同網段，直接連線可能失敗。","takeaway":"Ethernet 像道路，IP 就像地址；插上網路線不代表地址設定正確。","keywords":["IPv4","Subnet Mask","Gateway","192.168"]},{"day":5,"title":"TCP 與 Port：找到設備後，還要找到正確服務","category":"通訊與網路","why":"知道目的設備的 IP 還不夠，同一台設備可能同時運行多個服務，而且重要資料需要可靠送達。","source":"1970 年代由 Vint Cerf、Bob Kahn 等人的網路協定研究逐步發展。","original":"提供可靠、有順序的端到端資料傳輸。","principle":"TCP 先建立連線，再利用序號、確認與重傳等機制確保資料可靠；Port 用來區分同一 IP 上的不同應用服務。","evolution":"TCP/IP 成為 Internet 與企業網路核心協定；工業設備也大量採用 TCP Socket。","use":"固定式 Scanner、IPC、Server 之間可靠傳輸條碼、狀態與控制資料。","case":"192.168.1.100:9000 可理解為『連到 192.168.1.100 這台設備的 9000 號服務窗口』。","takeaway":"IP 是大樓地址，Port 是部門窗口，TCP 是有確認機制的可靠物流。","keywords":["TCP","Port","Handshake","Socket","Client/Server"]},{"day":6,"title":"API：兩套軟體怎麼互相理解要求","category":"系統整合","why":"資料送到另一套系統後，對方還需要知道『你要做什麼』與『資料欄位代表什麼』。","source":"API 概念早於 Web，源自程式、函式庫與作業系統之間的介面；網路普及後形成大量 Web API。","original":"把複雜功能封裝起來，提供其他程式可依規則呼叫的介面。","principle":"呼叫端依 API 規格提出 Request，包含方法、路徑與資料；服務端執行邏輯後回傳 Response。REST API 常搭配 HTTP 與 JSON。","evolution":"從本機函式介面擴展到 Web Service、REST API、雲端服務與設備 API。","use":"WMS、MES、ERP、ESL Server、PDA 與其他應用系統交換業務資料。","case":"WMS 呼叫 ESL REST API，要求指定 Label 顯示揀貨數量並閃燈。","takeaway":"TCP/IP 把你帶到系統門口；API 才是告訴你『可以辦什麼業務、要怎麼辦』的菜單。","keywords":["REST","HTTP","JSON","GET","POST"]},{"day":7,"title":"Database：大量資料如何被安全保存與關聯","category":"資料與平台","why":"當多人、多設備、多系統同時使用資料時，單純檔案與試算表難以維持一致性、關聯與並行讀寫。","source":"1960 年代早期 DBMS；1970 年 Edgar F. Codd 提出關聯式資料模型。","original":"集中管理大量企業資料，降低程式與實體存放方式的耦合。","principle":"資料以表格、欄位與關聯管理；DBMS 提供查詢、權限、交易、索引與故障復原等能力。","evolution":"從階層式／網狀資料庫發展到關聯式資料庫、NoSQL、分散式與雲端資料庫。","use":"ERP、MES、WMS、資產管理、報表與追溯資料的核心儲存層。","case":"MES 把條碼、站點、工單、時間與 PASS/NG 結果寫入 Database，日後才能追溯。","takeaway":"Database 不只是『更大的 Excel』，而是讓多個程式能一致地保存、查詢與更新資料。","keywords":["DBMS","SQL","Transaction","ACID","Table"]},{"day":8,"title":"PLC：把控制規則從電線搬進程式","category":"現場控制","why":"傳統繼電器控制盤接線複雜，每次修改產線邏輯都要大幅重接線。","source":"1968 年 GM Hydra-Matic 尋找繼電器替代方案；Bedford Associates 團隊發展 Modicon 084 等早期 PLC。","original":"以可程式方式取代大量繼電器邏輯，讓產線控制更容易修改與維護。","principle":"PLC 持續執行 Scan Cycle：讀 Input → 執行 Logic → 更新 Output，控制馬達、氣缸、燈號等。","evolution":"從簡單離散 I/O 控制發展到高速 I/O、運動控制、工業網路與系統整合。","use":"產線連鎖、馬達／氣缸控制、Sensor 訊號處理、設備狀態交換。","case":"Scanner NG 時，PLC 可依邏輯停止輸送帶並點亮警示燈。","takeaway":"PLC 的革命，是把『寫在接線裡的控制邏輯』變成『可以修改的程式邏輯』。","keywords":["Input","Output","Logic","Scan Cycle","Relay"]},{"day":9,"title":"Modbus：讓工業設備用共同規則讀寫資料","category":"系統整合","why":"不同廠商設備即使能傳電訊號，也未必知道對方資料代表重量、溫度或狀態。","source":"1979 年 Modicon 發展 Modbus，最初用於 PLC 與工業設備間交換資料。","original":"定義一套簡單公開的工業設備讀寫資料規則。","principle":"Client 依 Function Code 讀寫 Server 的 Coil/Register；實際欄位意義由設備的 Register Map 定義。","evolution":"從串列 Modbus RTU 擴展到基於 TCP/IP 的 Modbus TCP。","use":"PLC 與溫控器、電表、電子秤、遠端 I/O、IPC 等交換狀態與數值。","case":"PLC 透過 Modbus 讀取電子秤某個 Register，原始值 255 按比例換算為 25.5 kg。","takeaway":"RS-232/Ethernet 解決『怎麼傳』，Modbus 進一步定義『設備怎麼問、怎麼回、讀哪個資料位置』。","keywords":["Register","Function Code","RTU","Modbus TCP","RS-485"]},{"day":10,"title":"MES：把生產計畫變成可追蹤的現場執行","category":"企業系統","why":"ERP 知道要生產什麼、PLC 知道設備在做什麼，但企業還需要掌握工單實際進度、品質與產品履歷。","source":"由早期排程、生產資料收集與現場管理系統逐步演變；1990 年代 MES 概念與 MESA 模型逐漸標準化。","original":"管理製造現場的工單執行、報工、品質、資源與追溯。","principle":"接收生產任務 → 按工藝流程執行與驗證 → 蒐集現場結果 → 管理 PASS/NG、工序與追溯 → 回報實績。","evolution":"逐步整合 ERP、PLC、SCADA、設備數據、IoT 與分析平台。","use":"工單管理、過站驗證、生產履歷、品質、報工、追溯。","case":"Scanner 掃到 A001 後，MES 判斷是否屬於目前工單、前工序是否完成，再決定 PASS/NG。","takeaway":"ERP 說『要做什麼』，PLC 控制『機器怎麼動』，MES 管理『現場實際做成什麼樣』。","keywords":["工單","過站","追溯","PASS/NG","ISA-95"]},{"day":11,"title":"WMS：不只知道有多少，還要知道貨在哪裡","category":"企業系統","why":"企業只知道總庫存不夠，倉庫還要管理商品位置、批次、狀態、任務與實際移動。","source":"從紙本庫存卡、早期電腦化庫存控制，逐步演進為條碼化與流程化的倉儲管理系統。","original":"提升收貨、上架、儲位、揀貨、出貨與盤點的可控性與準確性。","principle":"用商品、儲位、批次、狀態與任務建立庫存位置模型，讓每次移動都在系統中留下紀錄。","evolution":"從庫存記錄發展到任務優化、PDA 作業、RFID、自動倉儲、AGV/AMR 與智慧揀貨。","use":"收貨、上架、補貨、揀貨、盤點、出庫、批次／效期與儲位管理。","case":"WMS 產生 A-01-03 揀 5 件 A001 的任務，PDA 顯示任務、ESL 閃燈提示，完成後 WMS 更新庫存。","takeaway":"ERP 可能知道『有 100 件』，WMS 更關心『這 100 件在哪裡、什麼狀態、下一步怎麼移動』。","keywords":["儲位","上架","揀貨","盤點","PDA"]},{"day":12,"title":"RFID：讓物品透過無線電回覆自己的身分","category":"識別與感知","why":"條碼需要光學視線與逐件對準，大量盤點或非接觸式識別效率受限。","source":"技術脈絡可追溯至無線電、雷達與 IFF；1948 年 Harry Stockman 研究反射功率通訊，1970 年代被動式識別技術持續發展。","original":"在不直接接觸或目視的情況下，透過射頻辨識物體。","principle":"Reader 發射射頻能量與指令 → 被動 Tag 取能 → Tag 透過 Backscatter 調變反射訊號 → Reader 解碼 EPC 等資料。","evolution":"晶片與標籤成本下降、EPC Gen2 等標準成熟，促成 UHF RFID 在物流與零售大量應用。","use":"批量盤點、資產管理、門禁、物流箱／棧板辨識、智慧零售。","case":"RFID 手持機批量讀取資產 EPC，後端系統將 EPC 對應到資產主檔，再與應盤清單比對。","takeaway":"Barcode 用光『看』身分；RFID 用無線電『詢問並接收回覆』。","keywords":["Reader","Tag","Backscatter","EPC","UHF"]},{"day":13,"title":"Edge Computing：為什麼資料要先在工廠現場處理","category":"資料與平台","why":"設備資料若每次都送遠端系統才處理，會受到網路延遲、頻寬與斷線影響；工廠需要在現場即時處理、暫存和篩選資料。","source":"源自分散式運算的長期發展；1990 年代末 CDN 將內容放到靠近使用者的節點，2010 年代 IoT 與工業設備資料激增，推動把運算也移近資料來源。2018 年 NIST 的 Fog Computing Conceptual Model 說明相關分層概念。","original":"讓內容或部分處理能力靠近使用者與資料來源，降低往返遠端中心的等待時間與負載。","principle":"Scanner／Sensor 產生資料 → 現場 IPC／Gateway 先解碼、驗證格式、加時間戳、排除重複與持久化暫存 → 有網路時再透過 API 傳送 MES → 取得確認後標記已送達。哪些業務判定可離線執行，須先與 MES 確認。","evolution":"從 CDN 邊緣快取，擴展到 IoT Gateway、工業 IPC、邊緣 AI 與容器化部署；由於低延遲、減少傳輸量與離線韌性需求，形成雲端與現場分工的架構。","use":"產線掃碼暫存補傳、RFID 事件過濾、設備異常預警、影像初步辨識、工廠本地資料整合與網路不穩時維持可允許的現場功能。","case":"四台 Scanner 經 Switch 送到有 4G 的觸控式 IPC。IPC 先記錄 barcode、station、event_id、timestamp 到本地佇列；MES 暫時不可連線時保留待送資料，恢復後重試並依 MES 回覆確認。IPC 只能執行事先授權的本地判斷，不能把「暫存成功」當成「MES 過站成功」。","takeaway":"Edge Computing 不是多買一台 IPC，而是把適合的運算與暫存放在資料產生處，減少對遠端網路的即時依賴。","keywords":["Edge Computing","邊緣運算","IPC","Offline Buffer","Store and Forward","4G","MES"]}];
+const CATEGORY_ORDER = ["識別與感知","通訊與網路","現場控制","系統整合","資料與平台","企業系統"];
+const root = document;
+const grid = root.getElementById("lessonGrid");
+const empty = root.getElementById("emptyState");
+const search = root.getElementById("search");
+
+function esc(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function renderLessons(filter="") {
+  const q = filter.trim().toLowerCase();
+  const items = LESSONS.filter(x => {
+    const blob = [x.day,x.title,x.category,x.why,x.source,x.original,x.principle,x.evolution,x.use,x.case,x.takeaway,...x.keywords].join(" ").toLowerCase();
+    return !q || blob.includes(q);
+  });
+  grid.innerHTML = items.map(x => `
+    <article class="lesson" id="day-${x.day}">
+      <div class="meta"><span class="day">Day ${x.day}</span><span class="cat">${esc(x.category)}</span></div>
+      <h3>${esc(x.title)}</h3>
+      <div class="takeaway"><strong>今天只記一件事：</strong>${esc(x.takeaway)}</div>
+      <div class="details">
+        <details><summary>1. 為什麼會出現？</summary><p>${esc(x.why)}</p></details>
+        <details><summary>2. 來源／前身</summary><p>${esc(x.source)}</p></details>
+        <details><summary>3. 最初用途</summary><p>${esc(x.original)}</p></details>
+        <details><summary>4. 核心原理</summary><p>${esc(x.principle)}</p></details>
+        <details><summary>5. 為什麼演變成現在這樣？</summary><p>${esc(x.evolution)}</p></details>
+        <details><summary>6. 現代用途</summary><p>${esc(x.use)}</p></details>
+        <details><summary>7. 工作案例</summary><p>${esc(x.case)}</p></details>
+      </div>
+      <div class="keywords">${x.keywords.map(k=>`<span class="kw">${esc(k)}</span>`).join("")}</div>
+    </article>`).join("");
+  empty.style.display = items.length ? "none" : "block";
+}
+function renderMap() {
+  const box = root.getElementById("branches");
+  const grouped = {};
+  LESSONS.forEach(x => (grouped[x.category] ||= []).push(x));
+  box.innerHTML = CATEGORY_ORDER.filter(c => grouped[c]).map(c => `
+    <section class="branch">
+      <h3>${esc(c)}</h3>
+      <div class="nodes">
+        ${grouped[c].map(x => `
+          <button class="node" type="button" data-day="${x.day}">
+            <div class="n-day">Day ${x.day}</div>
+            <div class="n-title">${esc(x.title.split("：")[0])}</div>
+          </button>`).join("")}
+      </div>
+    </section>`).join("");
+  box.querySelectorAll(".node").forEach(btn => btn.addEventListener("click", () => {
+    activate("lessons");
+    const el = root.getElementById("day-" + btn.dataset.day);
+    if (el) el.scrollIntoView({behavior:"smooth", block:"start"});
+  }));
+}
+function activate(id) {
+  root.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === id));
+  root.querySelectorAll(".tab").forEach(t => t.classList.toggle("active", t.dataset.view === id));
+}
+root.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => activate(t.dataset.view)));
+search.addEventListener("input", e => { activate("lessons"); renderLessons(e.target.value); });
+root.getElementById("totalLessons").textContent = LESSONS.length;
+root.getElementById("totalKeywords").textContent = new Set(LESSONS.flatMap(x=>x.keywords)).size;
+root.getElementById("latestBadge").textContent = `已整理 Day 1–${Math.max(...LESSONS.map(x=>x.day))}`;
+renderLessons();
+renderMap();
+</script>
+</body>
+</html>
